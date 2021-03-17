@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-frontend-dev-121425-authRole",
+      "UnauthRoleArn": "arn:aws:iam::536254204126:role/amplify-frontend-dev-121425-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::536254204126:role/amplify-frontend-dev-121425-authRole",
+      "Region": "eu-west-1",
+      "DeploymentBucketName": "amplify-frontend-dev-121425-deployment",
+      "UnauthRoleName": "amplify-frontend-dev-121425-unauthRole",
+      "StackName": "amplify-frontend-dev-121425",
+      "StackId": "arn:aws:cloudformation:eu-west-1:536254204126:stack/amplify-frontend-dev-121425/a2c72d10-72a3-11eb-9324-0a932fa4c699",
+      "AmplifyAppId": "d2z5xqzr10y107"
+    },
+    "categories": {
+      "auth": {
+        "frontend8613e4b4": {
+          "userPoolId": "eu-west-1_ELtCvGwX0",
+          "userPoolName": "awsome-builder",
+          "webClientId": "m8scl7i4cbrvisib9lkmoi76a",
+          "nativeClientId": "m8scl7i4cbrvisib9lkmoi76a",
+          "identityPoolId": "eu-west-1:a52bd905-584e-481e-bbee-b63225a9812c",
+          "identityPoolName": "awsome_builder",
+          "allowUnauthenticatedIdentities": true,
+          "authRoleArn": "arn:aws:iam::536254204126:role/Cognito_awsome_builderAuth_Role",
+          "authRoleName": "Cognito_awsome_builderAuth_Role",
+          "unauthRoleArn": "arn:aws:iam::536254204126:role/Cognito_awsome_builderUnauth_Role",
+          "unauthRoleName": "Cognito_awsome_builderUnauth_Role"
+        }
+      }
+    }
+  }
+}

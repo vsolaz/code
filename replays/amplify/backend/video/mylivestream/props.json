@@ -1,0 +1,31 @@
+{
+    "mediaPackage": {
+        "endpoints": "HLS",
+        "startOverWindow": "86400"
+    },
+    "shared": {
+        "resourceName": "mylivestream"
+    },
+    "advanced": {
+        "gopSize": "1",
+        "gopPerSegment": "2",
+        "segsPerPlist": "3",
+        "advancedChoice": false
+    },
+    "mediaLive": {
+        "securityGroup": "0.0.0.0/0",
+        "ingestType": "MP4_FILE",
+        "encodingProfile": "FULL",
+        "autoStart": "YES",
+        "mp4URL": "https://d2daihpir3zpu3.cloudfront.net/TOP10Goals.mp4"
+    },
+    "mediaStorage": {
+        "storageType": "mPackage"
+    },
+    "cloudFront": {
+        "priceClass": "PriceClass_100",
+        "sBucketLogs": "game-log-replays1797",
+        "sLogPrefix": "cf_logs/",
+        "enableDistribution": "YES"
+    }
+}

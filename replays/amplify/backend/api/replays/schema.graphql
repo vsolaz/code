@@ -1,0 +1,10 @@
+# amplify/backend/api/gamereplays/schema.graphql
+
+type Replay @model @auth(rules: [{ allow: owner, operations: [create, delete] }]) {
+    id: ID!
+    rname: String!
+    rurl: String!
+    upVotes: Int!
+    downVotes: Int!
+}
+

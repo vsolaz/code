@@ -1,0 +1,6 @@
+{
+  "authSelections": "identityPoolAndUserPool",
+  "resourceName": "frontend8613e4b4",
+  "serviceType": "imported",
+  "region": "eu-west-1"
+}
