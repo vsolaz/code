@@ -99,12 +99,16 @@ class VoteReplay extends Component {
     togglePositive = async (event) => {
         event.preventDefault();
         const result = await API.graphql(graphqlOperation(this.UpdateMutation, { id: this.props.replay.id, upVotes: this.upVotes + 1, downVotes: this.downVotes }));
+        this.upVotes= this.upVotes + 1;
         console.log('togglePositive: graphqlOperation returned: ', result);
+        this.forceUpdate();
     }
     toggleNegative = async (event) => {
         event.preventDefault();
         const result = await API.graphql(graphqlOperation(this.UpdateMutation, { id: this.props.replay.id, upVotes: this.upVotes, downVotes: this.downVotes + 1 }));
+        this.downVotes= this.downVotes + 1;
         console.log('toggleNegative: graphqlOperation returned: ', result);
+        this.forceUpdate();
     }
     render() {
         return (<div><button onClick={this.togglePositive}> <h2>Upvote</h2> </button>
@@ -171,13 +175,13 @@ class ReplaysListLoader extends React.Component {
         this.setState(state => ({data: updatedData}));
     }
 
- /*
-    onUpdateReplay = (replay) => {
+ 
+    /*onUpdateReplay = (replay) => {
         // This subscription handler enables near realtime availability of replays to fans
         let updatedData = this.state.data;
         console.log('onUpdateReplay:',replay.value);
         //updatedData.listReplays.items = this.state.data.listReplays.items.filter(item => item.id !== replay.value.data.onUpdateReplay.id);
-        updatedData.listReplays.items = this.state.data.listReplays.items.concat();
+        //updatedData.listReplays.items = this.state.data.listReplays.items.concat();
         //updatedData.listReplays.items = this.state.data.listReplays.items;
         this.setState(state => ({data: updatedData}));
         this.forceUpdate();
