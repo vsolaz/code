@@ -151,17 +151,7 @@ class ReplaysListLoader extends React.Component {
         };
     }
    
-    onUpdateReplay = (replay) => {
-        // This subscription handler enables near realtime availability of replays to fans
-        let updatedData = this.state.data;
-        console.log('onUpdateReplay:',replay.value);
-        //updatedData.listReplays.items = this.state.data.listReplays.items.filter(item => item.id !== replay.value.data.onUpdateReplay.id);
-        //updatedData.listReplays.items = this.state.data.listReplays.items.concat([replay.value.data.onUpdateReplay]);
-        updatedData.listReplays.items = this.state.data.listReplays.items;
-        this.setState(state => ({data: updatedData}));
-        this.forceUpdate();
-        console.log('updatedData:', updatedData);
-    }
+    
     
 
     onNewReplay = (replay) => {
@@ -171,6 +161,8 @@ class ReplaysListLoader extends React.Component {
         updatedData.listReplays.items = this.state.data.listReplays.items.concat([replay.value.data.onCreateReplay]);
         this.setState(state => ({data: updatedData}));
     }
+
+
     onDeleteReplay = (replay) => {
         // This subscription handler enables near realtime availability of replays to fans
         let updatedData = this.state.data;
@@ -179,7 +171,22 @@ class ReplaysListLoader extends React.Component {
         this.setState(state => ({data: updatedData}));
     }
 
- 
+ /*
+    onUpdateReplay = (replay) => {
+        // This subscription handler enables near realtime availability of replays to fans
+        let updatedData = this.state.data;
+        console.log('onUpdateReplay:',replay.value);
+        //updatedData.listReplays.items = this.state.data.listReplays.items.filter(item => item.id !== replay.value.data.onUpdateReplay.id);
+        updatedData.listReplays.items = this.state.data.listReplays.items.concat();
+        //updatedData.listReplays.items = this.state.data.listReplays.items;
+        this.setState(state => ({data: updatedData}));
+        this.forceUpdate();
+        console.log('updatedData:', updatedData);
+    }
+
+*/
+
+
     async componentDidMount() {
         //Make the query ListReplays
         const result = await API.graphql(graphqlOperation(queries.listReplays));
