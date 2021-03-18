@@ -20,30 +20,7 @@ Amplify.configure(aws_exports);
 //The CloudFront URL for MediaPackage Endpoint that is streaming the video
 const mp_url = aws_video_config.awsOutputLiveHLS;
 
-/*const ListReplays = `query ListReplays {
-    listReplays {
-        items {
-            id
-            rname
-            rurl
-            PosVotes
-            NegVotes
-        }
-    }
-}`;*/
 
-
-
-/*const SubscribeToNewReplays = `
-  subscription OnCreateReplay {
-    onCreateReplay {
-      id
-      rname
-      rurl
-    }
-  }
-`;
-*/
 
 //Implement the mechanism that the operator can use to create a new replay
 class NewReplay extends Component {
@@ -69,20 +46,6 @@ class NewReplay extends Component {
         const upVotes = 0
         const downVotes = 0
 
-        //Add a new Replay to the DynamoDB table using AppSync mutation
-        /*const ReplayMutation = `mutation NewReplay($rname: String!, $rurl: String!, $PosVotes: Int, $NegVotes: Int) {
-            createReplay(input: {rname: $rname, rurl: $rurl, PosVotes: $PosVotes, NegVotes: $NegVotes,}) {
-                id
-                rname
-                rurl
-                PosVotes
-                NegVotes
-            }
-        }`;*/
-
-        //const newReplayVars = { rname: rname, rurl: urlstr, upVotes: upVotes, downVotes: downVotes }
-        //console.log(newReplayVars)
-        
         const result = await API.graphql(graphqlOperation(mutations.createReplay, { input: {rname: rname, rurl: urlstr, upVotes:upVotes, downVotes:downVotes }}));
         console.log('handleClick: graphqlOperation returned: ', result);
     }
@@ -111,47 +74,42 @@ class DeleteReplay extends Component {
 }
 
 
-class VoteReplayUp extends Component {
+class VoteReplay extends Component {
     constructor(props) {
         super(props);
         // This binding is necessary to make `this` work in the callback
-        this.handleClick = this.handleClick.bind(this);
+        this.togglePositive = this.togglePositive.bind(this);
+        this.toggleNegative = this.toggleNegative.bind(this);
+        this.upVotes = this.props.replay.upVotes || 0;
+        this.downVotes = this.props.replay.downVotes || 0;
+        
+        this.UpdateMutation = `mutation UpdateReplay($id: ID!, $upVotes: Int, $downVotes: Int) {
+            updateReplay(input: {id: $id, upVotes: $upVotes, downVotes: $downVotes}) {
+                id
+                rname
+                rurl
+                upVotes
+                downVotes
+                createdAt
+                updatedAt
+            }
+        }`; 
     }
 
-
-
-    handleClick = async (event) => {
+    togglePositive = async (event) => {
         event.preventDefault();
-        const getUpvotes = `query getReplay($id: ID!) {
-            getReplay(id:$id) {
-              upVotes
-            }
-          }`;
-
-        const upVotes = await API.graphql(graphqlOperation(getUpvotes, {id:this.props.id}));
-        const id = this.props.id;
-        console.log('handleClick: graphqlOperation returned: ', upVotes);
-        /*const initUpVotes = uPvotes.upVotes
-        console.log('id from new class: ', id);   
-        console.log('initUpVotes from new class: ', initUpVotes);     
-       
-        var calcUpVotes = initUpVotes;
-
-        if (calcUpVotes === 0){
-            calcUpVotes = 1
-        } else {
-            calcUpVotes++
-        }
-
-        const upVotes = calcUpVotes
-
-        console.log('upvotes from new class: ', upVotes);
-       
-        const result = await API.graphql(graphqlOperation(mutations.updateReplay, { input: {id:id, upVotes:upVotes}}));      
-        console.log('handleClick: graphqlOperation returned: ', result); */
+        const result = await API.graphql(graphqlOperation(this.UpdateMutation, { id: this.props.replay.id, upVotes: this.upVotes + 1, downVotes: this.downVotes }));
+        console.log('togglePositive: graphqlOperation returned: ', result);
+    }
+    toggleNegative = async (event) => {
+        event.preventDefault();
+        const result = await API.graphql(graphqlOperation(this.UpdateMutation, { id: this.props.replay.id, upVotes: this.upVotes, downVotes: this.downVotes + 1 }));
+        console.log('toggleNegative: graphqlOperation returned: ', result);
     }
     render() {
-        return (<button onClick={this.handleClick}> <h3>New_UpVote</h3> </button>); 
+        return (<div><button onClick={this.togglePositive}> <h2>Upvote</h2> </button>
+        <span>{this.upVotes} - {this.downVotes}</span>
+        <button onClick={this.toggleNegative}> <h2>Downvote</h2> </button></div>);
     }
 }
 
@@ -160,37 +118,13 @@ class VoteReplayUp extends Component {
 class ReplaysList extends React.Component {
   //Each replay is displayed using the ReactPlayer component
 
-  handleClick = (p_id,p_upVotes) => async (event) => {
-    console.log(p_id);
-    event.preventDefault();
-    const id = p_id;  
-    var upVotes = p_upVotes;
-
-    if (upVotes === 0){
-        upVotes = 1
-    } else {
-        upVotes++
-    }
-   
-    const result = await API.graphql(graphqlOperation(mutations.updateReplay, { input: {id: id, upVotes: upVotes}}));    
-    console.log('handleClick: graphqlOperation returned: ', result);
-    console.log('handleClick: positive vote entered, current positive votes= ' , upVotes);
-
-    this.forceUpdate();
-     
-   }
-
   replayItems() {
     return this.props.replays.map(replay =>
       <List.Item key={replay.id}>
         <Header as='h2'>Replay: {replay.rname} </Header>
         <ReactPlayer url={replay.rurl} playing muted controls={true} width='50%' height='50%' />
-        <div>Replay ID: {replay.id}</div>
-        <div>UpVotes: {replay.upVotes}</div>
-        <div>DownVotes: {replay.downVotes}</div>
-        <button onClick={this.handleClick(replay.id,replay.upVotes)}>Up-Vote</button> 
-        <DeleteReplay id={replay.id}/>  
-        <VoteReplayUp id={replay.id}/>  
+        <DeleteReplay id={replay.id}/> 
+        <VoteReplay replay={replay}/> 
       </List.Item>
     );
   }
@@ -216,19 +150,36 @@ class ReplaysListLoader extends React.Component {
             }
         };
     }
+   
+    onUpdateReplay = (replay) => {
+        // This subscription handler enables near realtime availability of replays to fans
+        let updatedData = this.state.data;
+        console.log('onUpdateReplay:',replay.value);
+        //updatedData.listReplays.items = this.state.data.listReplays.items.filter(item => item.id !== replay.value.data.onUpdateReplay.id);
+        //updatedData.listReplays.items = this.state.data.listReplays.items.concat([replay.value.data.onUpdateReplay]);
+        updatedData.listReplays.items = this.state.data.listReplays.items;
+        this.setState(state => ({data: updatedData}));
+        this.forceUpdate();
+        console.log('updatedData:', updatedData);
+    }
+    
+
     onNewReplay = (replay) => {
         // This subscription handler enables near realtime availability of replays to fans
         let updatedData = this.state.data;
+        console.log('onCreateReplay:',replay.value);
         updatedData.listReplays.items = this.state.data.listReplays.items.concat([replay.value.data.onCreateReplay]);
         this.setState(state => ({data: updatedData}));
     }
     onDeleteReplay = (replay) => {
         // This subscription handler enables near realtime availability of replays to fans
         let updatedData = this.state.data;
+        console.log('onDeleteReplay:',replay.value);
         updatedData.listReplays.items = this.state.data.listReplays.items.filter(item => item.id !== replay.value.data.onDeleteReplay.id);
         this.setState(state => ({data: updatedData}));
     }
 
+ 
     async componentDidMount() {
         //Make the query ListReplays
         const result = await API.graphql(graphqlOperation(queries.listReplays));
@@ -237,10 +188,13 @@ class ReplaysListLoader extends React.Component {
             graphqlOperation(subscriptions.onCreateReplay)).subscribe({ next: this.onNewReplay } );
         const subscriptionDeleteReplay = await API.graphql(
             graphqlOperation(subscriptions.onDeleteReplay)).subscribe({ next: this.onDeleteReplay });
+        const subscriptionUpdateReplay = await API.graphql(
+            graphqlOperation(subscriptions.onUpdateReplay)).subscribe({ next: this.onUpdateReplay }); 
 
         //setState to force a new rendering
-        console.log('ReplaysListLoader: componentDidMount: NewReplay', result.data, subscriptionNewReplay);
+        console.log('ReplaysListLoader: componentDidMount: CreateReplay', result.data, subscriptionNewReplay);
         console.log('ReplaysListLoader: componentDidMount: DeleteReplay', result.data, subscriptionDeleteReplay);
+        console.log('ReplaysListLoader: componentDidMount: UpdateReplay', result.data, subscriptionUpdateReplay);
         this.setState(state => ({
             data: result.data
         }));
@@ -257,7 +211,7 @@ class PlayStream extends Component {
         return (
             <div>
                 <Header as='h1'>Live Stream </Header>
-                <ReactPlayer url={mp_url} playing muted controls={true} width='100%' height='100%' />
+                <ReactPlayer url={mp_url} playing muted controls={true} width='75%' height='75%' />
             </div>
         );
     }
@@ -306,7 +260,7 @@ class App extends Component {
                             <div>
                                 <PlayStream />
                                 <NewReplay />
-                            </div>
+                           </div>
                         )}
                         {this.state.uname !== '' && (
                             <ReplaysListLoader />
