@@ -34,7 +34,7 @@ const mp_url = aws_video_config.awsOutputLiveHLS;
 
 
 
-const SubscribeToNewReplays = `
+/*const SubscribeToNewReplays = `
   subscription OnCreateReplay {
     onCreateReplay {
       id
@@ -43,6 +43,7 @@ const SubscribeToNewReplays = `
     }
   }
 `;
+*/
 
 //Implement the mechanism that the operator can use to create a new replay
 class NewReplay extends Component {
@@ -105,7 +106,52 @@ class DeleteReplay extends Component {
         console.log('handleClick: graphqlOperation returned: ', result);
     }
     render() {
-        return (<button onClick={this.handleClick}> <h2>Delete Replay</h2> </button>);
+        return (<button onClick={this.handleClick}> <h3>Delete</h3> </button>);
+    }
+}
+
+
+class VoteReplayUp extends Component {
+    constructor(props) {
+        super(props);
+        // This binding is necessary to make `this` work in the callback
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+
+
+    handleClick = async (event) => {
+        event.preventDefault();
+        const getUpvotes = `query getReplay($id: ID!) {
+            getReplay(id:$id) {
+              upVotes
+            }
+          }`;
+
+        const upVotes = await API.graphql(graphqlOperation(getUpvotes, {id:this.props.id}));
+        const id = this.props.id;
+        console.log('handleClick: graphqlOperation returned: ', upVotes);
+        /*const initUpVotes = uPvotes.upVotes
+        console.log('id from new class: ', id);   
+        console.log('initUpVotes from new class: ', initUpVotes);     
+       
+        var calcUpVotes = initUpVotes;
+
+        if (calcUpVotes === 0){
+            calcUpVotes = 1
+        } else {
+            calcUpVotes++
+        }
+
+        const upVotes = calcUpVotes
+
+        console.log('upvotes from new class: ', upVotes);
+       
+        const result = await API.graphql(graphqlOperation(mutations.updateReplay, { input: {id:id, upVotes:upVotes}}));      
+        console.log('handleClick: graphqlOperation returned: ', result); */
+    }
+    render() {
+        return (<button onClick={this.handleClick}> <h3>New_UpVote</h3> </button>); 
     }
 }
 
@@ -144,6 +190,7 @@ class ReplaysList extends React.Component {
         <div>DownVotes: {replay.downVotes}</div>
         <button onClick={this.handleClick(replay.id,replay.upVotes)}>Up-Vote</button> 
         <DeleteReplay id={replay.id}/>  
+        <VoteReplayUp id={replay.id}/>  
       </List.Item>
     );
   }
